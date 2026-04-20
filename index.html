@@ -13,9 +13,10 @@
         }
 
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: relative;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
             height: 100vh;
             background-color: #000000;
             overflow: hidden;
@@ -26,6 +27,9 @@
         }
 
         .app-wrapper {
+            position: absolute;
+            left: 50%;
+            top: 50%;
             display: flex;
             width: 1920px;
             height: 1080px;
@@ -1500,7 +1504,7 @@
                             <div class="title">Dance with me</div>
                             <div class="artist">Singer name</div>
                         </div>
-                        <img class="media-play-icon" src="assets/images/ic_dock_play.svg" alt="Play">
+                        <img class="media-play-icon" src="assets/images/ic_music_play_s.svg" alt="Play">
                     </div>
                 </div>
 
@@ -2073,6 +2077,14 @@
                 } else if (mode === 'right-edge') {
                     snapByLeftWidth(1848); // 仅仅点击边缘，退回右边缘全屏
                 }
+
+                // 200ms 动画结束后，恢复默认的 0.6s 过渡动画，防止全局动画被永远加速
+                setTimeout(() => {
+                    sceneContainer_gesture.style.transition = '';
+                    mapWindow.style.transition = '';
+                    midWidget.style.transition = '';
+                    uiEls.forEach(el => el.style.transition = '');
+                }, 250);
             } else {
                 sceneContainer_gesture.style.transition = '';
                 mapWindow.style.transition = '';
@@ -3694,12 +3706,22 @@
 
         function syncScale() {
             const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-            _wrapper.style.transform = `scale(${s})`;
+            _wrapper.style.transform = `translate(-50%, -50%) scale(${s})`;
         }
 
         syncScale();
         window.addEventListener('resize', syncScale);
-        document.addEventListener('fullscreenchange', syncScale);
+        document.addEventListener('fullscreenchange', () => {
+            syncScale();
+            setTimeout(syncScale, 100);
+            setTimeout(syncScale, 500);
+        });
+
+        // Add orientationchange for iPad
+        window.addEventListener('orientationchange', () => {
+            setTimeout(syncScale, 100);
+            setTimeout(syncScale, 500);
+        });
 
         document.getElementById('fullscreen-btn').addEventListener('click', () => {
             if (!document.fullscreenElement) {
