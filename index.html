@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cockpit Preview</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+
+<body>
+    <div id="loading-screen">
+        <div class="loading-logo">AI COCKPIT <span>INITIALIZING</span></div>
+        <div class="loading-bar-container">
+            <div class="loading-bar-fill" id="loading-fill"></div>
+        </div>
+        <div class="loading-text" id="loading-text">0%</div>
+    </div>
+    <div class="app-wrapper">
+        <div class="canvas" id="canvas">
+
+
+
+            <!-- Particle Matrix Layer (Global Canvas) -->
+            <!-- Map Window (Right Window) -->
+            <div class="map-window" style="z-index: 20;">
+                <img src="assets/images/img_map_01.png" alt="Map" class="map-bg">
+
+                <!-- 地图左上角 UI -->
+                <div class="map-ui-item map-search">
+                    <img class="map-ui-icon" src="assets/images/ic_sr_search.svg" alt="Search">
+                    搜地点、查路线
+                </div>
+                <div class="map-ui-item map-btn-1">
+                    <img class="map-ui-icon dark" src="assets/images/ic_sr_home.svg" alt="Home">
+                </div>
+                <div class="map-ui-item map-btn-2">
+                    <img class="map-ui-icon dark" src="assets/images/ic_sr_office.svg" alt="Office">
+                </div>
+
+                <!-- 地图左下角 UI -->
+                <div class="map-ui-item map-self-location">
+                    <img class="map-ui-icon dark" src="assets/images/ic_map_selflocation.png" alt="Self Location">
+                </div>
+
+                <!-- Settings Overlay for Map Window -->
+                <div class="settings-overlay" id="settings-overlay-map">
+                    <img src="assets/images/img_settings.png" alt="Settings Background" class="settings-bg">
+                    <div class="settings-close-btn" id="settings-close-btn-map">
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider Touch Zone -->
+            <div id="divider-touch-zone"></div>
+
+            <!-- Divider Handle — always visible, tracks gap between windows -->
+            <div id="mid-widget"></div>
+
+            <!-- Car Scene -->
+            <div class="scene-container" id="three-js-canvas-container">
+                <canvas id="three-canvas"></canvas> <img src="assets/images/weather.png" alt="Weather"
+                    class="weather-text">
+                <img src="assets/images/goog_morning.png" alt="Good Morning" class="good-morning">
+                <img src="assets/images/control_l.png" alt="Control Left" class="control-l">
+                <img src="assets/images/control_r.png" alt="Control Right" class="control-r">
+
+                <!-- Settings Overlay for Scene Container -->
+                <div class="settings-overlay" id="settings-overlay-scene">
+                    <img src="assets/images/img_settings.png" alt="Settings Background" class="settings-bg">
+                    <div class="settings-close-btn" id="settings-close-btn-scene">
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
+                            fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Independent Navigation Widgets -->
+                <div class="nav-item-base nav-item-go-home" id="go-home-widget">
+                    <div class="go-home-bg-layer">
+                        <div class="go-home-btn-placeholder"></div>
+                        <div class="go-home-text-wrapper">
+                            <div class="go-home-text"><span>Go</span> Home</div>
+                        </div>
+                        <div class="ngp-icon-wrapper">
+                            <img class="ngp-icon" src="assets/images/ic_sr_ngp.svg" alt="NGP">
+                        </div>
+                    </div>
+                    <div class="go-home-fill" id="go-home-fill">
+                        <div class="go-home-fill-content">
+                            <div class="go-home-btn-placeholder">
+                                <div class="go-home-arrows" id="go-home-arrows">
+                                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                        fill="none" version="1.1" width="38.56066131591797" height="22.12109375"
+                                        viewBox="0 0 38.56066131591797 22.12109375">
+                                        <path
+                                            d="M34.93934251591797,11.060546875L26.00000121591797,19.999887875L28.12132141591797,22.121205875L38.12132031591797,12.121205875Q38.22578631591797,12.016739875,38.307865315917965,11.893900875Q38.38994231591797,11.771061875,38.44647931591797,11.634570875Q38.50301531591797,11.498078875,38.53183631591797,11.353181875Q38.56065931591797,11.208284875,38.56065931591797,11.060546875Q38.56065931591797,10.912809375,38.53183631591797,10.767911875Q38.50301531591797,10.623013475,38.44647931591797,10.486522675Q38.38994231591797,10.350030875,38.30786431591797,10.227191975Q38.22578631591797,10.104352975,38.12132031591797,9.999887475L28.12132141591797,-0.00011322499999999458L26.00000121591797,2.1212069749999998L34.93934251591797,11.060546875Z"
+                                            fill-rule="evenodd" fill="#FFFFFF" fill-opacity="1" />
+                                        <g style="opacity:0.6000000238418579;">
+                                            <path
+                                                d="M21.939342515917968,11.060546875L13.000001215917969,19.999887875L15.121321415917969,22.121205875L25.12132031591797,12.121205875Q25.22578631591797,12.016739875,25.30786531591797,11.893900875Q25.38994231591797,11.771061875,25.44647931591797,11.634570875Q25.50301531591797,11.498078875,25.53183631591797,11.353181875Q25.560659315917967,11.208284875,25.560659315917967,11.060546875Q25.560659315917967,10.912809375,25.53183631591797,10.767911875Q25.50301531591797,10.623013475,25.44647931591797,10.486522675Q25.38994231591797,10.350030875,25.307864315917968,10.227191975Q25.22578631591797,10.104352975,25.12132031591797,9.999887475L15.121321415917969,-0.00011322499999999458L13.000001215917969,2.1212069749999998L21.939342515917968,11.060546875Z"
+                                                fill-rule="evenodd" fill="#FFFFFF" fill-opacity="1" />
+                                        </g>
+                                        <g style="opacity:0.20000000298023224;">
+                                            <path
+                                                d="M8.939342515917968,11.060546875L0.00000121591796875542,19.999887875L2.1213214159179685,22.121205875L12.121320315917968,12.121205875Q12.225786315917968,12.016739875,12.307865315917969,11.893900875Q12.389942315917969,11.771061875,12.44647931591797,11.634570875Q12.503015315917969,11.498078875,12.53183631591797,11.353181875Q12.560659315917968,11.208284875,12.560659315917968,11.060546875Q12.560659315917968,10.912809375,12.53183631591797,10.767911875Q12.503015315917969,10.623013475,12.44647931591797,10.486522675Q12.389942315917969,10.350030875,12.30786431591797,10.227191975Q12.225786315917968,10.104352975,12.121320315917968,9.999887475L2.1213214159179685,-0.00011322499999999458L0.00000121591796875542,2.1212069749999998L8.939342515917968,11.060546875Z"
+                                                fill-rule="evenodd" fill="#FFFFFF" fill-opacity="1" />
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="go-home-text-wrapper">
+                                <div class="go-home-text white-text"><span class="white-sub">Go</span> Home</div>
+                            </div>
+                            <div class="ngp-icon-wrapper">
+                                <img class="ngp-icon invert-icon" src="assets/images/ic_sr_ngp.svg" alt="NGP">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-item-base nav-item-search">
+                    <img class="search-icon" src="assets/images/ic_sr_search.svg" alt="Search">
+                    搜索
+                </div>
+
+                <div class="nav-item-base nav-item-shortcuts">
+                    <div class="shortcut-icon-btn">
+                        <img src="assets/images/ic_sr_home.svg" alt="Home">
+                    </div>
+                    <div class="v-divider"></div>
+                    <div class="shortcut-icon-btn">
+                        <img src="assets/images/ic_sr_office.svg" alt="Office">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scene Mode Overlay (Moved to root of Canvas) -->
+            <div class="scene-mode-overlay" id="scene-mode-overlay">
+                <div class="scene-mode-close-btn" id="scene-mode-close-btn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </div>
+                <div class="scene-mode-content">
+                    <div class="scene-mode-layout">
+                        <div class="scene-mode-card card-car-wash"><img src="assets/images/img_mode_Wash.png"
+                                alt="Car Wash"></div>
+                        <div class="scene-mode-right-col">
+                            <div class="scene-mode-row">
+                                <div class="scene-mode-card card-camping"><img src="assets/images/img_mode_camping.png"
+                                        alt="Camping"></div>
+                                <div class="scene-mode-card card-rest"><img src="assets/images/img_mode_rest.png"
+                                        alt="Rest"></div>
+                            </div>
+                            <div class="scene-mode-row">
+                                <div class="scene-mode-card card-charge"><img src="assets/images/img_mode_charge.png"
+                                        alt="Charge"></div>
+                                <div class="scene-mode-card card-exit"><img src="assets/images/img_exitcomfort.png"
+                                        alt="Exit Comfort"></div>
+                                <div class="scene-mode-card card-pet"><img src="assets/images/img_mode_pet.png"
+                                        alt="Pet Mode"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Common Top/Bottom -->
+
+            <div class="new-status-bar">
+                <div class="status-left" id="status-left-btn">
+                    <img src="assets/images/ic_ngp.svg" alt="NGP">
+                    <img src="assets/images/ic_limit_max.svg" alt="Limit Max">
+                    <img src="assets/images/ic_limit.svg" alt="Limit">
+                </div>
+                <div class="status-right">
+                    <div class="status-temp">
+                        <img src="assets/images/ic_temperature.svg" alt="Temp">
+                        -20°
+                    </div>
+                    <div class="status-pill status-connections">
+                        <img src="assets/images/ic_video.svg" alt="Camera">
+                        <img src="assets/images/ic_bluetooth.svg" alt="Bluetooth">
+                        <img src="assets/images/ic_wifi.svg" alt="WiFi">
+                    </div>
+                    <div class="status-pill">
+                        <img src="assets/images/ic_battery.svg" alt="Battery">
+                        <div class="status-value">600<span class="status-unit">km</span></div>
+                        <div class="status-value">80<span class="status-unit">%</span></div>
+                    </div>
+                    <div class="status-pill">
+                        <img src="assets/images/ic_tank.svg" alt="Tank">
+                        <div class="status-value">1200<span class="status-unit">km</span></div>
+                    </div>
+                    <img class="status-avatar" id="debug-avatar-btn" src="assets/images/头像.png" alt="Profile">
+                    <div class="status-time">08:00</div>
+                </div>
+            </div>
+
+            <!-- New HTML CSS Dock replacing the Image Dock -->
+            <div class="new-dock">
+                <!-- 1. Home (68px) -->
+                <div class="dock-group w-68 m-gap-10">
+                    <img id="layout-cycle-btn" class="home-icon" style="margin-left: 0;"
+                        src="assets/images/ic_dock_home2.svg" alt="Home">
+                </div>
+
+                <!-- 2. Group 1: HVAC Left (300px) -->
+                <div class="dock-group temp-group w-300 m-gap-10">
+                    <div class="dot-divider"></div>
+                    <div class="temp-text">23.5°</div>
+                    <div class="dot-divider orange"></div>
+                </div>
+
+                <!-- 3. Group 2: Shortcuts (300px) -->
+                <div class="dock-group shortcut-group w-300 m-gap-48">
+                    <img class="shortcut-icon" src="assets/images/ic_dock_cleanfog.svg" alt="Defrost">
+                    <img class="shortcut-icon" src="assets/images/ic_dock_360.svg" alt="360 Cam">
+                    <img class="shortcut-icon" src="assets/images/ic_dock_control.svg" alt="Controls">
+                </div>
+
+                <!-- 4. Group 3: Center Apps (352px) -->
+                <div class="dock-group app-group w-352 m-gap-48">
+                    <img src="assets/images/ic_dock_camera.png" alt="Camera">
+                    <img src="assets/images/ic_dock_browser.png" alt="Browser">
+                    <img src="assets/images/ic_dock_avm.png" alt="AVM">
+                    <img src="assets/images/ic_dock_setting.png" alt="Settings" id="dock-settings-btn">
+                </div>
+
+                <!-- 5. Group 4: Media Player (300px) -->
+                <div class="dock-group media-group-wrap w-300 m-gap-10">
+                    <div class="media-capsule">
+                        <img class="media-cover" src="assets/images/img_music_cover.png" alt="Cover">
+                        <div class="media-info">
+                            <div class="title">Dance with me</div>
+                            <div class="artist">Singer name</div>
+                        </div>
+                        <img class="media-play-icon" src="assets/images/ic_music_play_s.svg" alt="Play">
+                    </div>
+                </div>
+
+                <!-- 6. Group 5: HVAC Right (300px) -->
+                <div class="dock-group temp-group w-300 m-gap-10">
+                    <div class="dot-divider"></div>
+                    <div class="temp-text">23.5°</div>
+                    <div class="dot-divider"></div>
+                </div>
+
+                <!-- 7. Volume (68px) -->
+                <div class="dock-group w-68">
+                    <img id="volume-debug-btn" class="volume-icon" src="assets/images/ic_dock_sound.svg" alt="Sound"
+                        style="cursor:pointer;">
+                </div>
+            </div> <!-- .new-dock end -->
+
+            <!-- Pet Mode Overlay -->
+            <div class="pet-mode-overlay" id="pet-mode-overlay">
+                <img src="assets/images/img_pet.png" alt="Pet Mode Full" class="pet-mode-bg">
+                <div class="scene-mode-close-btn" id="pet-mode-close-btn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </div>
+            </div>
+        </div> <!-- .canvas end -->
+
+        <!-- Workspace Sidebar -->
+        <div class="workspace">
+            <div class="workspace-header">
+                <h2>摄像机调节 / Camera Controls</h2>
+                <button class="save-btn" id="save-btn">写入参数</button>
+            </div>
+            <div class="control-group">
+                <label>距离 Distance: <span id="val-distance">11.3</span></label>
+                <input type="range" id="ctrl-distance" min="3" max="30" step="0.1" value="11.3">
+            </div>
+            <div class="control-group">
+                <label>俯仰角 Elevation: <span id="val-elevation">1.5°</span></label>
+                <input type="range" id="ctrl-elevation" min="-2" max="80" step="0.5" value="1.5">
+            </div>
+            <div class="control-group">
+                <label>旋转 Azimuth: <span id="val-azimuth">126°</span></label>
+                <input type="range" id="ctrl-azimuth" min="-180" max="180" step="1" value="126">
+            </div>
+            <div class="control-group">
+                <label>焦距 Focal: <span id="val-focal">59mm</span></label>
+                <input type="range" id="ctrl-focal" min="16" max="200" step="1" value="59">
+            </div>
+            <div class="control-group">
+                <label>横向偏移 View Shift X: <span id="val-shift-x">0</span></label>
+                <input type="range" id="ctrl-shift-x" min="-1000" max="1000" step="1" value="0">
+            </div>
+            <div class="control-group">
+                <label>纵向偏移 View Shift Y: <span id="val-shift-y">0</span></label>
+                <input type="range" id="ctrl-shift-y" min="-1000" max="1000" step="1" value="0">
+            </div>
+
+
+            <div class="workspace-header" style="margin-top:20px;">
+                <h2>天空与地面 / Sky & Ground</h2>
+            </div>
+            <div class="control-group">
+                <label>天空顶部 Sky Top <span id="val-sky-top"></span></label>
+                <input type="color" id="ctrl-sky-top" value="#aaccff">
+            </div>
+            <div class="control-group">
+                <label>天空底部 Sky Bottom <span id="val-sky-bottom"></span></label>
+                <input type="color" id="ctrl-sky-bottom" value="#e8ecf0">
+            </div>
+            <div class="control-group">
+                <label>地面近景 Ground Near <span id="val-ground-near"></span></label>
+                <input type="color" id="ctrl-ground-near" value="#99aabb">
+            </div>
+            <div class="control-group">
+                <label>地面远景 Ground Far <span id="val-ground-far"></span></label>
+                <input type="color" id="ctrl-ground-far" value="#e8ecf0">
+            </div>
+            <div class="control-group">
+                <label>地平线模糊 Horizon Blur: <span id="val-horizon-blur">0.5</span></label>
+                <input type="range" id="ctrl-horizon-blur" min="0.01" max="2" step="0.01" value="0.5">
+            </div>
+            <div class="control-group">
+                <label>地面深度过渡 Ground Depth: <span id="val-ground-depth">50</span></label>
+                <input type="range" id="ctrl-ground-depth" min="10" max="300" step="1" value="50">
+            </div>
+
+            <div class="workspace-header" style="margin-top:20px;">
+                <h2>光影环境 / Lighting & Env</h2>
+            </div>
+            <div class="control-group">
+                <label>背景颜色 Background <span id="val-bg"></span></label>
+                <input type="color" id="ctrl-bg" value="#e8ecf0">
+            </div>
+            <div class="control-group">
+                <label>环境光颜色 Ambient <span id="val-ambient-color"></span></label>
+                <input type="color" id="ctrl-ambient-color" value="#dde5f0">
+            </div>
+            <div class="control-group">
+                <label>环境光强度 Ambient Int: <span id="val-ambient-int">0.2</span></label>
+                <input type="range" id="ctrl-ambient-int" min="0" max="2" step="0.01" value="0.2">
+            </div>
+            <div class="control-group">
+                <label>半球光天 Hemi Sky <span id="val-hemi-color"></span></label>
+                <input type="color" id="ctrl-hemi-color" value="#eef2ff">
+            </div>
+            <div class="control-group">
+                <label>半球光地 Hemi Ground <span id="val-hemi-ground"></span></label>
+                <input type="color" id="ctrl-hemi-ground" value="#dde0e8">
+            </div>
+            <div class="control-group">
+                <label>半球光强度 Hemi Int: <span id="val-hemi-int">0.15</span></label>
+                <input type="range" id="ctrl-hemi-int" min="0" max="2" step="0.01" value="0.15">
+            </div>
+            <div class="control-group">
+                <label>主光颜色 Main Light <span id="val-main-color"></span></label>
+                <input type="color" id="ctrl-main-color" value="#fff8f0">
+            </div>
+            <div class="control-group">
+                <label>主光强度 Main Int: <span id="val-main-int">1.0</span></label>
+                <input type="range" id="ctrl-main-int" min="0" max="5" step="0.1" value="1.0">
+            </div>
+            <div class="control-group">
+                <label>轮毂光颜色 Wheel Light <span id="val-wheel-color"></span></label>
+                <input type="color" id="ctrl-wheel-color" value="#c0c8d0">
+            </div>
+            <div class="control-group">
+                <label>轮毂光强度 Wheel Int: <span id="val-wheel-int">0.3</span></label>
+                <input type="range" id="ctrl-wheel-int" min="0" max="5" step="0.1" value="0.3">
+            </div>
+            <div class="control-group">
+                <label>补光颜色 Dir Light <span id="val-dir-color"></span></label>
+                <input type="color" id="ctrl-dir-color" value="#f0ece0">
+            </div>
+            <div class="control-group">
+                <label>补光强度 Dir Int: <span id="val-dir-int">0.6</span></label>
+                <input type="range" id="ctrl-dir-int" min="0" max="5" step="0.1" value="0.6">
+            </div>
+            <div class="control-group">
+                <label>阴影透明度 Shadow Opacity: <span id="val-shadow-opacity">0.8</span></label>
+                <input type="range" id="ctrl-shadow-opacity" min="0" max="1" step="0.01" value="0.8">
+            </div>
+            <div class="control-group">
+                <label>泛光强度 Bloom Strength: <span id="val-bloom">0.0</span></label>
+                <input type="range" id="ctrl-bloom" min="0" max="2" step="0.01" value="0.0">
+            </div>
+            <div class="control-group">
+                <label>曝光度 Exposure: <span id="val-exposure">1.0</span></label>
+                <input type="range" id="ctrl-exposure" min="0.1" max="3" step="0.1" value="1.0">
+            </div>
+            <div class="control-group">
+                <label>地面网格透明度 Grid Opacity: <span id="val-grid">0.2</span></label>
+                <input type="range" id="ctrl-grid" min="0" max="1" step="0.01" value="0.2">
+            </div>
+
+            <div class="workspace-header" style="margin-top:20px;">
+                <h2>车漆质感 / Car Paint</h2>
+            </div>
+            <div class="control-group">
+                <label>车漆颜色 Body Color <span id="val-body-color"></span></label>
+                <input type="color" id="ctrl-body-color" value="#EBEDF2">
+            </div>
+            <div class="control-group">
+                <label>金属度 Metalness: <span id="val-body-metal">0.3</span></label>
+                <input type="range" id="ctrl-body-metal" min="0" max="1" step="0.01" value="0.3">
+            </div>
+            <div class="control-group">
+                <label>粗糙度 Roughness: <span id="val-body-rough">0.95</span></label>
+                <input type="range" id="ctrl-body-rough" min="0" max="1" step="0.01" value="0.95">
+            </div>
+            <div class="control-group">
+                <label>清漆强度 Clearcoat: <span id="val-body-cc">0.0</span></label>
+                <input type="range" id="ctrl-body-cc" min="0" max="1" step="0.01" value="0.0">
+            </div>
+            <div class="control-group">
+                <label>清漆粗糙度 CC Roughness: <span id="val-body-ccr">1.0</span></label>
+                <input type="range" id="ctrl-body-ccr" min="0" max="1" step="0.01" value="1.0">
+            </div>
+            <div class="control-group">
+                <label>环境反射 Env Map Int: <span id="val-body-env">0.25</span></label>
+                <input type="range" id="ctrl-body-env" min="0" max="5" step="0.01" value="0.25">
+            </div>
+            <div class="control-group">
+                <label>AO强度 AO Intensity: <span id="val-body-ao">0.6</span></label>
+                <input type="range" id="ctrl-body-ao" min="0" max="2" step="0.01" value="0.6">
+            </div>
+            <div class="control-group">
+                <label>法线强度 Normal Scale: <span id="val-body-normal">1.4</span></label>
+                <input type="range" id="ctrl-body-normal" min="0" max="5" step="0.1" value="1.4">
+            </div>
+            <div class="control-group">
+                <label>边缘光强度 View Lit: <span id="val-body-viewlit">0.05</span></label>
+                <input type="range" id="ctrl-body-viewlit" min="0" max="1" step="0.01" value="0.05">
+            </div>
+            <div class="control-group">
+                <label>高光强度 High Lit: <span id="val-body-highlit">0.02</span></label>
+                <input type="range" id="ctrl-body-highlit" min="0" max="1" step="0.01" value="0.02">
+            </div>
+
+            <div class="workspace-header" style="margin-top:20px;">
+                <h2>放射与材质 / Emissive & Mats</h2>
+            </div>
+            <div class="control-group">
+                <label>前灯放射强度 Front Lamps: <span id="val-lamps-int">0.5</span></label>
+                <input type="range" id="ctrl-lamps-int" min="0" max="20" step="0.1" value="0.5">
+            </div>
+            <div class="control-group">
+                <label>尾灯放射颜色 Rear Emissive <span id="val-rear-color"></span></label>
+                <input type="color" id="ctrl-rear-color" value="#ff2200">
+            </div>
+            <div class="control-group">
+                <label>尾灯放射强度 Rear Lamps: <span id="val-rear-int">0.3</span></label>
+                <input type="range" id="ctrl-rear-int" min="0" max="20" step="0.1" value="0.3">
+            </div>
+            <div class="control-group">
+                <label>玻璃颜色 Glass Color <span id="val-glass-color"></span></label>
+                <input type="color" id="ctrl-glass-color" value="#222228">
+            </div>
+            <div class="control-group">
+                <label>玻璃透明度 Glass Opacity: <span id="val-glass-opacity">0.3</span></label>
+                <input type="range" id="ctrl-glass-opacity" min="0" max="1" step="0.01" value="0.3">
+            </div>
+            <div class="control-group">
+                <label>内饰颜色 Interior Color <span id="val-int-color"></span></label>
+                <input type="color" id="ctrl-int-color" value="#ffffff">
+            </div>
+            <div class="control-group">
+                <label>内饰粗糙度 Int Roughness: <span id="val-int-rough">0.6</span></label>
+                <input type="range" id="ctrl-int-rough" min="0" max="1" step="0.01" value="0.6">
+            </div>
+            <div class="control-group">
+                <label>内饰金属度 Int Metalness: <span id="val-int-metal">0.4</span></label>
+                <input type="range" id="ctrl-int-metal" min="0" max="1" step="0.01" value="0.4">
+            </div>
+            <div class="control-group">
+                <label>内饰反射 Interior Env: <span id="val-int-env">0.3</span></label>
+                <input type="range" id="ctrl-int-env" min="0" max="2" step="0.01" value="0.3">
+            </div>
+        </div>
+    </div> <!-- .app-wrapper end -->
+
+
+
+    <script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/",
+        "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js"
+    }
+}
+</script>
+
+    <script type="module" src="assets/js/scene.js"></script>
+    <button id="fullscreen-btn" title="全屏"></button>
+
+    <script src="assets/js/ui.js"></script>
+
+</body>
+
+</html>
