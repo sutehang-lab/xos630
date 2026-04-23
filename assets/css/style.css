@@ -1,0 +1,1526 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    overflow: hidden;
+    color: #fff;
+    font-family: sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.app-wrapper {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: flex;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: center;
+    /* transform set by JS syncScale() to fill viewport independently on X/Y */
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.canvas {
+    width: 1920px;
+    height: 1080px;
+    position: relative;
+    background-color: #FCFCFC;
+    overflow: hidden;
+}
+
+/* --- Workspace Sidebar --- */
+.workspace {
+    position: absolute;
+    right: 24px;
+    top: 84px;
+    z-index: 9999;
+    display: none;
+    width: 400px;
+    height: 884px;
+    background-color: rgba(17, 17, 17, 0.9);
+    padding: 30px;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+}
+
+.workspace h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #00FBFF;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-group label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.control-group span {
+    font-family: monospace;
+    color: #fff;
+}
+
+.control-group input[type="range"] {
+    width: 100%;
+    accent-color: #00FBFF;
+}
+
+.control-group input[type="color"] {
+    width: 100%;
+    height: 40px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: none;
+}
+
+.workspace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.workspace-header h2 {
+    margin-bottom: 0;
+}
+
+.save-btn {
+    background: #00FBFF;
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+.save-btn:hover {
+    opacity: 0.8;
+}
+
+.save-btn:active {
+    opacity: 0.6;
+}
+
+
+
+/* Status Bar */
+.new-status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 72px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    padding: 0 40px;
+    box-sizing: border-box;
+    pointer-events: auto;
+}
+
+.new-status-bar .status-left,
+.new-status-bar .status-right {
+    display: flex;
+    align-items: center;
+}
+
+.new-status-bar .status-left {
+    gap: 16px;
+    cursor: pointer;
+    pointer-events: auto;
+    border-radius: 36px;
+    /* slightly smaller to fit the bar precisely if it's 72px high */
+    padding: 0 16px;
+    transition: background-color 0.3s;
+    height: 56px;
+    margin-left: -16px;
+    /* offset the padding to keep original visual position */
+    box-sizing: border-box;
+}
+
+.new-status-bar .status-left.active-driving {
+    background-color: #367CFF;
+}
+
+.new-status-bar .status-left.active-driving img:nth-child(1),
+.new-status-bar .status-left.active-driving img:nth-child(2) {
+    filter: brightness(0) invert(1);
+    opacity: 1;
+}
+
+.new-status-bar .status-left:active {
+    transform: scale(0.95);
+}
+
+.new-status-bar .status-right {
+    gap: 24px;
+}
+
+.new-status-bar .status-left img {
+    width: 40px;
+    height: 40px;
+}
+
+.new-status-bar .status-left:not(.active-driving) img:nth-child(1),
+.new-status-bar .status-left:not(.active-driving) img:nth-child(2) {
+    opacity: 0.4;
+}
+
+.new-status-bar .status-temp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+}
+
+.new-status-bar .status-temp img {
+    width: auto;
+    height: 40px;
+}
+
+.new-status-bar .status-pill {
+    background: #EFF1F5;
+    border-radius: 24px;
+    /* Slightly larger border-radius to match 48px height */
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    color: #111;
+}
+
+.new-status-bar .status-pill img {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+}
+
+.new-status-bar .status-pill.status-connections {
+    gap: 16px;
+}
+
+.new-status-bar .status-value {
+    font-size: 20px;
+    /* Upgraded to 20 */
+    font-weight: 700;
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+}
+
+.new-status-bar .status-unit {
+    font-size: 16px;
+    /* Upgraded to 16 */
+    font-weight: 500;
+    color: #888;
+}
+
+.new-status-bar .status-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.new-status-bar .status-avatar:active {
+    transform: scale(0.9);
+}
+
+.new-status-bar .status-time {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    font-family: sans-serif;
+}
+
+.dock {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 1920px;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.new-dock {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1872px;
+    height: 88px;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 24px;
+    box-sizing: border-box;
+    pointer-events: auto;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Fixed Width Container Base */
+.new-dock .dock-group {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Default to center for icon-only groups */
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* Precise Widths */
+.new-dock .w-300 {
+    width: 300px;
+}
+
+.new-dock .w-352 {
+    width: 352px;
+}
+
+.new-dock .w-68 {
+    width: 68px;
+}
+
+/* Precise Margins (Gaps) */
+.new-dock .m-gap-10 {
+    margin-right: 10px;
+}
+
+.new-dock .m-gap-48 {
+    margin-right: 48px;
+}
+
+/* Specific alignment for each group type */
+.new-dock .temp-group {
+    justify-content: space-between;
+    padding: 0 40px;
+}
+
+.new-dock .shortcut-group {
+    justify-content: center;
+    gap: 54px;
+}
+
+.new-dock .media-group-wrap {
+    justify-content: center;
+}
+
+.new-dock .app-group {
+    justify-content: space-between;
+    /* Force exact 32px gaps within 352px width */
+    padding: 0;
+}
+
+.new-dock .app-group img {
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    object-fit: contain;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+/* Scale compensation for icons with large transparent margins */
+.new-dock .app-group img[src*="browser"],
+.new-dock .app-group img[src*="avm"] {
+    transform: scale(1.15);
+}
+
+.new-dock img {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+/* Combined scaling on hover to avoid resetting the base compensation */
+.new-dock .app-group img[src*="browser"]:hover,
+.new-dock .app-group img[src*="avm"]:hover {
+    transform: scale(1.25);
+}
+
+.new-dock img:hover {
+    transform: scale(1.1);
+}
+
+/* Generic Dot Divider */
+.new-dock .dot-divider {
+    width: 6px;
+    height: 6px;
+    background: #A0A5AA;
+    border-radius: 50%;
+}
+
+.new-dock .dot-divider.orange {
+    background: #FF9500;
+    box-shadow: 0 0 8px rgba(255, 149, 0, 0.6);
+}
+
+/* Temperature Style */
+.new-dock .temp-text {
+    font-size: 32px;
+    font-weight: 500;
+    color: #333;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -1px;
+}
+
+/* Home Icon Specific */
+.new-dock .home-icon {
+    width: 68px;
+    height: 68px;
+    filter: brightness(0.2);
+    margin-left: 12px;
+}
+
+/* Shortcut Icons (Updated to 34x34) */
+.new-dock .shortcut-icon {
+    width: 34px;
+    height: 34px;
+    filter: brightness(0.2);
+}
+
+
+/* Media Player Redesign (Updated to 300x56 as per request) */
+.new-dock .media-capsule {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background: #F1F3F6;
+    border-radius: 28px;
+    /* Half of 56px height for full pill shape */
+    height: 56px;
+    width: 300px;
+    gap: 12px;
+    box-sizing: border-box;
+}
+
+.new-dock .media-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    object-fit: cover;
+}
+
+.new-dock .media-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+.new-dock .media-info .title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.new-dock .media-info .artist {
+    font-size: 11px;
+    color: #888;
+}
+
+.new-dock .media-play-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0.2);
+}
+
+/* Independent Navigation Components */
+.nav-item-base {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    box-sizing: border-box;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.canvas.ui-ready .nav-item-base {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.nav-item-go-home {
+    left: 44px;
+    top: 118px;
+    width: 370px;
+    height: 72px;
+    padding: 6px;
+    overflow: visible;
+    border-radius: 24px;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.nav-item-search {
+    left: 44px;
+    top: 214px;
+    width: 201px;
+    height: 72px;
+    padding: 0 24px;
+    gap: 12px;
+    color: #333;
+    font-size: 20px;
+    font-weight: 500;
+    transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.nav-item-shortcuts {
+    left: 269px;
+    top: 214px;
+    width: 145px;
+    height: 72px;
+    justify-content: space-evenly;
+    transition: top 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.go-home-bg-layer {
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    right: 6px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.go-home-fill {
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 104px;
+    background: #367CFF;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(54, 124, 255, 0.3);
+    z-index: 1;
+    transition: background 0.3s, border-radius 0.3s, left 0.3s, top 0.3s, bottom 0.3s, right 0.3s;
+    touch-action: none;
+}
+
+.go-home-fill-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 358px;
+    pointer-events: none;
+    transition: all 0.2s ease-out;
+}
+
+.go-home-btn-placeholder {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 104px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.go-home-arrows {
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.go-home-text-wrapper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.ngp-icon-wrapper {
+    position: absolute;
+    right: 12px;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.go-home-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #000000;
+    display: flex;
+    align-items: baseline;
+    transition: color 0.3s;
+}
+
+.go-home-text span {
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 400;
+    margin-right: 8px;
+    transition: color 0.3s;
+}
+
+.white-text {
+    color: #ffffff !important;
+}
+
+.white-text span {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.ngp-icon {
+    width: 44px;
+    height: 44px;
+    transition: filter 0.3s;
+}
+
+.invert-icon {
+    filter: brightness(0) invert(1);
+}
+
+/* 激活交互 CSS */
+.nav-item-go-home.activated-inner .go-home-fill {
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    border-radius: 24px !important;
+    box-shadow: none !important;
+}
+
+.nav-item-go-home.activated-inner .go-home-btn-placeholder {
+    opacity: 0;
+}
+
+.nav-item-go-home.activated-inner .go-home-fill-content {
+    left: 6px;
+    top: 6px;
+    bottom: 6px;
+    width: 358px;
+}
+
+.nav-item-go-home.activated-glow {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    /* 采用截图给出的确切数值：第一层 0 0 7px 0px，第二层 0 0 23px 3px，颜色 3377FF */
+    box-shadow: 0 0 7px 0px rgba(51, 119, 255, 1), 0 0 23px 3px rgba(51, 119, 255, 1) !important;
+}
+
+.nav-item-go-home.dismissed {
+    opacity: 0 !important;
+    transform: scale(0.9);
+    pointer-events: none;
+    transition: all 0.3s ease-out;
+}
+
+.nav-item-search.shifted-up,
+.nav-item-shortcuts.shifted-up {
+    top: 118px !important;
+    /* 顶替 Go Home 的位置 */
+}
+
+.canvas.state-2 .nav-item-search.shifted-up,
+.canvas.state-2 .nav-item-shortcuts.shifted-up {
+    top: 46px !important;
+}
+
+.search-icon {
+    width: 32px;
+    height: 32px;
+    opacity: 0.8;
+}
+
+.shortcut-icon-btn {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.shortcut-icon-btn img {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0.1);
+}
+
+.v-divider {
+    width: 1px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.1);
+    /* Subtle divider */
+    opacity: 0.5;
+}
+
+/* Hover/Active states */
+.nav-item-base:active {
+    transform: none;
+}
+
+/* Volume/Sound Icon */
+.new-dock .volume-icon {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0.2);
+}
+
+/* 4 Dashes icon for layout cycle */
+.dash-icon {
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.dash-icon span {
+    position: absolute;
+    width: 6px;
+    height: 2px;
+    background: #fff;
+    border-radius: 1px;
+}
+
+.dash-icon .d-top-left {
+    top: 4px;
+    left: 1px;
+    transform: rotate(45deg);
+}
+
+.dash-icon .d-top-right {
+    top: 4px;
+    right: 1px;
+    transform: rotate(-45deg);
+}
+
+.dash-icon .d-bottom-left {
+    bottom: 4px;
+    left: 1px;
+    transform: rotate(-45deg);
+}
+
+.dash-icon .d-bottom-right {
+    bottom: 4px;
+    right: 1px;
+    transform: rotate(45deg);
+}
+
+/* Map Window (Right Window) */
+.map-window {
+    position: absolute;
+    top: 72px;
+    /* Guessing to vertically center with dock */
+    left: 1944px;
+    /* 1920 + 24 gap */
+    width: 1240px;
+    height: 912px;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 1;
+    border-radius: 24px;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* --- GLOW EFFECTS STRUCTURE --- */
+
+/* Containers expand outwards to provide unclipped space for the blur */
+.glow-container {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.canvas.state-2 .glow-container {
+    opacity: 1;
+}
+
+/* The mask element that defines the exact shape of the ring */
+.glow-mask {
+    position: absolute;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    overflow: hidden;
+}
+
+/* The giant spinning gradient inside the mask */
+.glow-spinner {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    /* 替换为与胶囊光晕一致的红橙黄渐变色系 */
+    background: linear-gradient(to bottom,
+            rgba(255, 90, 95, 1) 0%,
+            /* #FF5A5F */
+            rgba(255, 145, 0, 1) 12.5%,
+            /* #FF9100 */
+            rgba(255, 245, 157, 1) 25%,
+            /* #FFF59D */
+            rgba(255, 145, 0, 1) 37.5%,
+            /* #FF9100 */
+            rgba(255, 90, 95, 1) 50%,
+            /* #FF5A5F */
+            /* 下半部分完全重复，保证平滑衔接 */
+            rgba(255, 145, 0, 1) 62.5%,
+            rgba(255, 245, 157, 1) 75%,
+            rgba(255, 145, 0, 1) 87.5%,
+            rgba(255, 90, 95, 1) 100%);
+    /* Speed up 300%: from 4s to 1.33s */
+    animation: sweepGlow 1.33s linear infinite;
+}
+
+@keyframes sweepGlow {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(50%);
+    }
+}
+
+/* Container for the huge soft aura */
+.glow-aura-outer {
+    position: absolute;
+    inset: -2px;
+    border-radius: 26px;
+    z-index: -3;
+    padding: 8px;
+    /* Slightly thicker for wide spread */
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: none;
+    filter: blur(24px);
+}
+
+.canvas.state-2 .glow-border,
+.canvas.state-2 .glow-aura {
+    opacity: 1;
+}
+
+.canvas.state-2 .glow-aura-outer {
+    opacity: 0.8;
+    /* Make the massive outer blur slightly softer */
+}
+
+/* --- PARTICLE MATRIX CSS --- */
+@keyframes matrixPulse {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    10% {
+        transform: scale(var(--max-scale, 0.95));
+        opacity: 1;
+    }
+
+    85% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.particle-pulse {
+    animation-name: matrixPulse;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    transform-origin: center center;
+    will-change: transform, opacity;
+}
+
+.map-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 24px;
+    /* Move border-radius here since overflow is visible on parent */
+    background-color: #FCFCFC;
+    /* Provide background just in case */
+}
+
+/* Scene Container (Left Window) */
+.scene-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 10;
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.scene-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* State 1 Elements */
+.weather-text {
+    position: absolute;
+    top: 100px;
+    left: 80px;
+    z-index: 20;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.good-morning {
+    position: absolute;
+    top: 180px;
+    left: 80px;
+    z-index: 20;
+    transition: opacity 0.4s ease-in-out;
+}
+
+/* Control Panel Elements (Inside Left Window) */
+.control-l,
+.control-r {
+    position: absolute;
+    z-index: 20;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: pointer;
+}
+
+/* State 1: Spread out in the full 1920x1080 scene */
+.control-l {
+    bottom: 136px;
+    left: 46px;
+}
+
+.control-r {
+    top: 118px;
+    right: 46px;
+}
+
+/* --- STATE 2 CSS --- */
+.canvas.state-2 .map-window {
+    left: 656px;
+    pointer-events: auto;
+}
+
+.canvas.state-2 .scene-container {
+    top: 72px;
+    /* Based on 912 height and 1080 total height */
+    left: 24px;
+    width: 608px;
+    height: 912px;
+    border-radius: 24px;
+}
+
+.canvas.state-2 .weather-text {
+    top: 40px;
+    left: 40px;
+    transform: scale(0.8);
+    transform-origin: top left;
+}
+
+.canvas.state-2 .good-morning {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.canvas.state-2 .control-l {
+    bottom: 40px;
+    left: 40px;
+}
+
+.canvas.state-2 .nav-item-go-home {
+    top: 46px;
+    left: 40px;
+}
+
+.canvas.state-2 .nav-item-search {
+    top: 142px;
+    left: 40px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.canvas.state-2 .nav-item-shortcuts {
+    top: 142px;
+    left: 265px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.canvas.state-2 .control-r {
+    top: 46px;
+}
+
+/* --- SWAPPED STATE (map left, scene right) --- */
+.canvas.state-2.swapped .map-window {}
+
+.canvas.state-2.swapped .scene-container {}
+
+/* Window Divider — rides inside map-window at its left edge */
+#divider-touch-zone {
+    position: absolute;
+    top: 72px;
+    left: 604px;
+    width: 56px;
+    height: 912px;
+    z-index: 30;
+    cursor: col-resize;
+    display: none;
+    touch-action: none;
+}
+
+.canvas.state-2 #divider-touch-zone {
+    display: block;
+}
+
+/* Mid-window Divider Handle */
+#mid-widget {
+    position: absolute;
+    left: 1905px;
+    /* state A: 11px from right edge (1920 - 11 - 4) */
+    top: 482px;
+    /* vertically centered: center 528 - half of 93 */
+    width: 4px;
+    height: 93px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.22);
+    pointer-events: none;
+    z-index: 30;
+    transition: left 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 80ms ease;
+}
+
+/* Overrides for left edge */
+.canvas.swapped:not(.state-c):not(.state-2) #mid-widget,
+.canvas.state-c:not(.swapped) #mid-widget {
+    left: 11px;
+}
+
+/* Override for right edge when state-c swapped */
+.canvas.state-c.swapped #mid-widget {
+    left: 1905px;
+}
+
+/* Map off-screen left when Scene is Full & Swapped */
+.canvas.swapped:not(.state-c):not(.state-2) .map-window {
+    left: -1264px;
+}
+
+/* Scene off-screen right when Map is Full & Swapped */
+.canvas.state-c.swapped .scene-container {
+    left: 1944px;
+}
+
+/* --- STATE C CSS (全屏地图) --- */
+.canvas.state-c .map-window {
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    border-radius: 0;
+    pointer-events: auto;
+    box-shadow: none;
+}
+
+.canvas.state-c .map-bg {
+    border-radius: 0;
+}
+
+.canvas.state-c .scene-container {
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.canvas.state-c .weather-text,
+.canvas.state-c .weather-text,
+.canvas.state-c .good-morning,
+.canvas.state-c .control-l,
+.canvas.state-c .control-r,
+.canvas.state-c .nav-item-base {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.canvas.state-c #divider-touch-zone {
+    display: none;
+}
+
+/* --- Map UI Elements --- */
+.map-ui-item {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    z-index: 30;
+    pointer-events: auto;
+    box-sizing: border-box;
+    transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: pointer;
+}
+
+.map-search {
+    left: 46px;
+    top: 118px;
+    width: 370px;
+    height: 72px;
+    padding: 0 24px;
+    gap: 12px;
+    color: #333;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.canvas.state-2 .map-search {
+    left: 40px;
+    top: 46px;
+}
+
+.map-btn-1 {
+    left: 440px;
+    top: 118px;
+    width: 72px;
+    height: 72px;
+    justify-content: center;
+}
+
+.canvas.state-2 .map-btn-1 {
+    left: 434px;
+    top: 46px;
+}
+
+.map-btn-2 {
+    left: 536px;
+    top: 118px;
+    width: 72px;
+    height: 72px;
+    justify-content: center;
+}
+
+.canvas.state-2 .map-btn-2 {
+    left: 530px;
+    top: 46px;
+}
+
+.map-ui-icon {
+    width: 32px;
+    height: 32px;
+    opacity: 0.8;
+}
+
+.map-ui-icon.dark {
+    filter: brightness(0.1);
+}
+
+.map-self-location {
+    left: 46px;
+    bottom: 136px;
+    width: 72px;
+    height: 72px;
+    justify-content: center;
+}
+
+.canvas.state-2 .map-self-location {
+    left: 40px;
+    bottom: 40px;
+}
+
+#three-js-canvas-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: -1;
+    /* 确保在 UI 图片下方 */
+    pointer-events: auto;
+    /* 允许 3D 场景接收点击/旋转事件 */
+}
+
+/* --- Fullscreen Button --- */
+#fullscreen-btn {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+    z-index: 999999;
+    transition: background 0.2s, transform 0.2s;
+    border: none;
+    padding: 0;
+}
+
+#fullscreen-btn:hover {
+    background: rgba(255, 255, 255, 0.75);
+    transform: scale(1.3);
+}
+
+/* --- Loading Screen 样式 --- */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #111111;
+    /* 极暗的深灰底色 */
+    z-index: 99999;
+    /* 保证它盖住屏幕上所有东西 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.loading-logo {
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    margin-bottom: 30px;
+}
+
+.loading-logo span {
+    font-weight: 600;
+    color: #00FBFF;
+}
+
+/* 进度条轨道 */
+.loading-bar-container {
+    width: 400px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    border-radius: 2px;
+}
+
+/* 进度条填充（带霓虹发光） */
+.loading-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background-color: #00FBFF;
+    box-shadow: 0 0 15px rgba(0, 251, 255, 0.8), 0 0 30px rgba(0, 251, 255, 0.4);
+    transition: width 0.1s ease-out;
+    /* 让进度涨起来顺滑 */
+}
+
+/* 百分比数字 */
+.loading-text {
+    color: rgba(255, 255, 255, 0.6);
+    font-family: monospace;
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin-top: 15px;
+    font-variant-numeric: tabular-nums;
+    /* 保证数字跳动时宽度固定不变 */
+}
+
+/* 确保 UI 图片不会遮挡 3D 交互 */
+.weather-text,
+.good-morning {
+    pointer-events: none;
+}
+
+.control-l,
+.control-r {
+    pointer-events: auto;
+    /* 允许点击图标 */
+}
+
+/* --- Settings Overlay --- */
+.settings-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    z-index: 200;
+    /* Above all map and scene UI items */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.settings-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.settings-close-btn {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, background 0.2s;
+    z-index: 101;
+}
+
+.settings-close-btn:active {
+    transform: scale(0.9);
+    background: rgba(255, 255, 255, 1);
+}
+
+/* --- Scene Mode Overlay --- */
+.scene-mode-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, #EDEDED, #F3F3F3);
+    z-index: 250;
+    /* Above settings-overlay */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-out;
+    display: flex;
+    flex-direction: column;
+    padding: 60px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.scene-mode-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.scene-mode-close-btn {
+    position: absolute;
+    top: 98px;
+    left: 114px;
+    width: 56px;
+    height: 56px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #333;
+    transition: background 0.2s, transform 0.2s;
+    z-index: 101;
+}
+
+.scene-mode-close-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.scene-mode-close-btn:active {
+    transform: scale(0.9);
+}
+
+.scene-mode-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.scene-mode-layout {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+}
+
+.scene-mode-right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+}
+
+.scene-mode-row {
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+}
+
+.scene-mode-card {
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.scene-mode-card:hover {
+    transform: scale(1.03);
+}
+
+.scene-mode-card:active {
+    transform: scale(0.97);
+}
+
+.scene-mode-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Hardcoded widths based on original design specs */
+.card-car-wash {
+    width: 272px;
+}
+
+.card-camping {
+    width: 854px;
+}
+
+.card-rest {
+    width: 272px;
+}
+
+.card-charge {
+    width: 272px;
+}
+
+.card-exit {
+    width: 272px;
+}
+
+.card-pet {
+    width: 534px;
+}
+
+/* --- Pet Mode Overlay --- */
+.pet-mode-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    /* Above new-dock and new-status-bar (z-index 1000) */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-out;
+    background: #000;
+}
+
+.pet-mode-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.pet-mode-overlay .pet-mode-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
