@@ -540,6 +540,7 @@ if (statusLeftBtn) {
 // 绑定头像点击打开/关闭工作区面板
 const debugAvatarBtn = document.getElementById('debug-avatar-btn');
 const workspacePanel = document.querySelector('.workspace');
+/*
 if (debugAvatarBtn && workspacePanel) {
     debugAvatarBtn.addEventListener('click', () => {
         if (workspacePanel.style.display === 'flex') {
@@ -549,6 +550,7 @@ if (debugAvatarBtn && workspacePanel) {
         }
     });
 }
+*/
 
 // AI Avatar Controller (Expressions + Physical Actions + Random Blinking)
 
