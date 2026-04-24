@@ -38,8 +38,8 @@ layoutCycleBtn.addEventListener('click', () => {
     }, 50); // 给一点延迟防止同步事件误判
 });
 
-// ── DEBUG: 音量按钮 → 交换左右窗口 ──────────────────────────────
-document.getElementById('volume-debug-btn').addEventListener('click', () => {
+// ── 窗口交换逻辑 ──────────────────────────────
+function swapWindows() {
     if (!canvas.classList.contains('state-2')) return; // 仅分屏时有效
 
     const midWidget = document.getElementById('mid-widget');
@@ -67,6 +67,50 @@ document.getElementById('volume-debug-btn').addEventListener('click', () => {
         snapState = newIsSwapped ? 'scene-2-3' : 'scene-1-3';
     }
     window.dispatchEvent(new CustomEvent('app-state-change', { detail: { snap: snapState } }));
+}
+
+// ── DEBUG: 音量按钮 → 交换左右窗口 ──────────────────────────────
+document.getElementById('volume-debug-btn').addEventListener('click', swapWindows);
+
+// ── 三指滑动互换窗口 ──────────────────────────────
+let _threeFingerStartX = 0;
+let _isThreeFingerSwiping = false;
+let _hasSwappedByTouch = false;
+
+document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 3) {
+        _isThreeFingerSwiping = true;
+        _hasSwappedByTouch = false;
+        let sumX = 0;
+        for (let i = 0; i < 3; i++) {
+            sumX += e.touches[i].clientX;
+        }
+        _threeFingerStartX = sumX / 3;
+    } else {
+        _isThreeFingerSwiping = false;
+    }
+});
+
+document.addEventListener('touchmove', (e) => {
+    if (!_isThreeFingerSwiping || e.touches.length !== 3) return;
+
+    let sumX = 0;
+    for (let i = 0; i < 3; i++) {
+        sumX += e.touches[i].clientX;
+    }
+    let currentX = sumX / 3;
+    let deltaX = currentX - _threeFingerStartX;
+
+    if (!_hasSwappedByTouch && Math.abs(deltaX) > 80) { // 80px 触发阈值
+        _hasSwappedByTouch = true;
+        swapWindows();
+    }
+});
+
+document.addEventListener('touchend', (e) => {
+    if (e.touches.length < 3) {
+        _isThreeFingerSwiping = false;
+    }
 });
 
 // 拖拽手势/状态改变时，同步循环按钮的内部索引（但不强行改变来回方向）
