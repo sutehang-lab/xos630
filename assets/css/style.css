@@ -150,7 +150,7 @@ body {
     align-items: center;
     justify-content: space-between;
     background: transparent;
-    padding: 0 40px;
+    padding: 0 40px 0 24px;
     box-sizing: border-box;
     pointer-events: auto;
 }
@@ -163,29 +163,33 @@ body {
 
 .new-status-bar .status-left {
     gap: 16px;
-    cursor: pointer;
-    pointer-events: auto;
-    border-radius: 36px;
-    /* slightly smaller to fit the bar precisely if it's 72px high */
-    padding: 0 16px;
-    transition: background-color 0.3s;
     height: 56px;
-    margin-left: -16px;
-    /* offset the padding to keep original visual position */
     box-sizing: border-box;
 }
 
-.new-status-bar .status-left.active-driving {
+.new-status-bar .status-driving {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    pointer-events: auto;
+    border-radius: 36px;
+    padding: 0 16px;
+    transition: background-color 0.3s;
+    height: 56px;
+}
+
+.new-status-bar .status-driving.active-driving {
     background-color: #367CFF;
 }
 
-.new-status-bar .status-left.active-driving img:nth-child(1),
-.new-status-bar .status-left.active-driving img:nth-child(2) {
+.new-status-bar .status-driving.active-driving img:nth-child(1),
+.new-status-bar .status-driving.active-driving img:nth-child(2) {
     filter: brightness(0) invert(1);
     opacity: 1;
 }
 
-.new-status-bar .status-left:active {
+.new-status-bar .status-driving:active {
     transform: scale(0.95);
 }
 
@@ -193,14 +197,33 @@ body {
     gap: 24px;
 }
 
-.new-status-bar .status-left img {
+.new-status-bar .status-driving img {
     width: 40px;
     height: 40px;
 }
 
-.new-status-bar .status-left:not(.active-driving) img:nth-child(1),
-.new-status-bar .status-left:not(.active-driving) img:nth-child(2) {
+.new-status-bar .status-driving:not(.active-driving) img:nth-child(1),
+.new-status-bar .status-driving:not(.active-driving) img:nth-child(2) {
     opacity: 0.4;
+}
+
+.new-status-bar .status-ready {
+    color: #1FAF7D;
+    font-size: 20px;
+    font-weight: 700;
+    margin-left: 8px;
+}
+
+.new-status-bar .status-connections {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.new-status-bar .status-connections img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
 }
 
 .new-status-bar .status-temp {
@@ -235,10 +258,6 @@ body {
     object-fit: contain;
 }
 
-.new-status-bar .status-pill.status-connections {
-    gap: 16px;
-}
-
 .new-status-bar .status-value {
     font-size: 20px;
     /* Upgraded to 20 */
@@ -256,17 +275,20 @@ body {
 }
 
 .new-status-bar .status-avatar {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    cursor: pointer;
-    transition: transform 0.2s;
+    flex-shrink: 0;
+    /* cursor: pointer;
+    transition: transform 0.2s; */
 }
 
+/*
 .new-status-bar .status-avatar:active {
     transform: scale(0.9);
 }
+*/
 
 .new-status-bar .status-time {
     font-size: 22px;
